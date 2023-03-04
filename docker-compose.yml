@@ -1,0 +1,20 @@
+version: '3.8'
+services:
+  dev-db:
+    image: postgres:13
+    ports:
+      - 5434:5432
+    env_file:
+      - .development.env
+    networks:
+      - freecodecamp
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8888:8080
+    networks:
+      - freecodecamp
+
+networks:
+  freecodecamp:

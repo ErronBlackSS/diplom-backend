@@ -13,8 +13,8 @@ lerna-debug.log*
 
 # OS
 .DS_Store
-.production.env
-.development.env
+/.production.env
+/.development.env
 # Tests
 /coverage
 /.nyc_output

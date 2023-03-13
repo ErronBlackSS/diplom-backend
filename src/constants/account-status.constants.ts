@@ -1,0 +1,3 @@
+export const VERIFICATION = 'VERIFICATION_WAITING';
+export const REJECTED = 'REJECTED';
+export const ACTIVATED = 'ACTIVATED';

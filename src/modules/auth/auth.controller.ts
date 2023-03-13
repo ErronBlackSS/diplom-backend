@@ -4,7 +4,11 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
-import { AuthDto, TokenResponse } from './dto/auth.dto';
+import {
+  AuthDto,
+  SignupResponse,
+  TokenResponse,
+} from './dto/auth.dto';
 
 @Controller('auth')
 @ApiTags('auth')
@@ -16,7 +20,7 @@ export class AuthController {
     type: TokenResponse,
   })
   @Post('singup')
-  signup(@Body() data: AuthDto): Promise<TokenResponse> {
+  signup(@Body() data: AuthDto): Promise<SignupResponse> {
     return this.authService.signup(data);
   }
 

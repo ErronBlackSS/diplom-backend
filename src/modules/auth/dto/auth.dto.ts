@@ -21,6 +21,21 @@ export class AuthDto {
   password: string;
 }
 
+export class SignupResponse {
+  @ApiProperty({
+    description: 'Email пользователя',
+  })
+  @IsEmail()
+  @IsNotEmpty()
+  email: string;
+
+  @ApiProperty({
+    description: 'Статус аккаута',
+  })
+  @IsNotEmpty()
+  status: string;
+}
+
 export class TokenResponse {
   @ApiProperty({
     description: 'access_token',

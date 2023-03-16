@@ -41,7 +41,7 @@ export class AuthController {
   async logout(
     @Body('token') refreshToken: string,
   ): Promise<{ success: true }> {
-    await this.authService.logout(refreshToken);
+    await this.authService.logout();
     return { success: true };
   }
 }

@@ -5,10 +5,17 @@ import { ForbiddenException } from '@nestjs/common';
 import { EMAIL_USER_CONFLICT } from 'src/constants/errors.constants';
 import * as argon from 'argon2';
 import { VERIFICATION } from 'src/constants/account-status.constants';
-
+import { MailService } from 'src/providers/mail/mail.service';
+import { v4 as uuidv4 } from 'uuid';
+import { ConfigService } from '@nestjs/config';
+import { FRONTEND_URL } from 'src/constants/config.constants';
 @Injectable()
 export class AuthService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private mailService: MailService,
+    private config: ConfigService,
+  ) {}
 
   async signup(
     signupData: AuthDto,
@@ -21,7 +28,7 @@ export class AuthService {
       },
     });
 
-    if (!testUser) {
+    if (testUser) {
       throw new ForbiddenException(EMAIL_USER_CONFLICT);
     }
 
@@ -34,7 +41,24 @@ export class AuthService {
       },
     });
 
+    const code = uuidv4();
+
+    this.prisma.emailVerification.upsert({
+      where: {
+        email: email,
+      },
+      update: {
+        code,
+        hash,
+      },
+      create: {
+        email,
+        hash,
+        code,
+      },
+    });
     // Далее ждем подтверждения по почте
+    this.sendEmailVerification(email);
 
     return {
       email: user.email,
@@ -42,7 +66,18 @@ export class AuthService {
     };
   }
 
-  async signin(signinData: AuthDto) {}
-
-  async logout() {}
+  private async sendEmailVerification(email: string) {
+    const activation_link = `${this.config.get<string>(
+      FRONTEND_URL,
+    )}/confirm?email=${email}`;
+    await this.mailService.send({
+      to: email,
+      subject: 'Регистрация в сервисе',
+      template: './email_verification.hbs',
+      context: {
+        email,
+        activation_link,
+      },
+    });
+  }
 }

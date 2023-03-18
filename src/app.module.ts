@@ -8,6 +8,7 @@ import { MailModule } from './providers/mail/mail.module';
     ConfigModule.forRoot({
       envFilePath: `.${process.env.NODE_ENV}.env`,
       isGlobal: true,
+      cache: true,
     }),
     PrismaModule,
     MailModule,

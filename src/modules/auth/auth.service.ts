@@ -58,7 +58,7 @@ export class AuthService {
       },
     });
     // Далее ждем подтверждения по почте
-    this.sendEmailVerification(email);
+    await this.sendEmailVerification(email, code);
 
     return {
       email: user.email,
@@ -66,10 +66,13 @@ export class AuthService {
     };
   }
 
-  private async sendEmailVerification(email: string) {
+  private async sendEmailVerification(
+    email: string,
+    token: string,
+  ) {
     const activation_link = `${this.config.get<string>(
       FRONTEND_URL,
-    )}/confirm?email=${email}`;
+    )}/confirm?token=${token}`;
     await this.mailService.send({
       to: email,
       subject: 'Регистрация в сервисе',

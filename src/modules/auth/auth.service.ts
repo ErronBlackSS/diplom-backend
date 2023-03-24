@@ -2,7 +2,10 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/providers/prisma/prisma.service';
 import { AuthDto, SignupResponse } from './dto/auth.dto';
 import { ForbiddenException } from '@nestjs/common';
-import { EMAIL_USER_CONFLICT } from 'src/constants/errors.constants';
+import {
+  EMAIL_USER_CONFLICT,
+  EMAIL_VERIFICATION_CONFLICT,
+} from 'src/constants/errors.constants';
 import * as argon from 'argon2';
 import { VERIFICATION } from 'src/constants/account-status.constants';
 import { MailService } from 'src/providers/mail/mail.service';
@@ -33,37 +36,42 @@ export class AuthService {
     }
 
     const hash = await argon.hash(password);
-
-    const user = await this.prisma.user.create({
-      data: {
-        email,
-        hash,
-      },
-    });
-
     const code = uuidv4();
 
-    this.prisma.emailVerification.upsert({
-      where: {
-        email: email,
-      },
-      update: {
-        code,
-        hash,
-      },
-      create: {
-        email,
-        hash,
-        code,
-      },
-    });
-    // Далее ждем подтверждения по почте
-    await this.sendEmailVerification(email, code);
+    try {
+      this.prisma.emailVerification.upsert({
+        where: {
+          email: email,
+        },
+        update: {
+          code,
+          hash,
+        },
+        create: {
+          email,
+          hash,
+          code,
+        },
+      });
 
-    return {
-      email: user.email,
-      status: VERIFICATION,
-    };
+      // Далее ждем подтверждения по почте
+      await this.sendEmailVerification(email, code);
+
+      return {
+        status: VERIFICATION,
+        message: 'need email verification',
+      };
+    } catch (error) {
+      await this.prisma.emailVerification.delete({
+        where: {
+          email: email,
+        },
+      });
+
+      throw new ForbiddenException(
+        EMAIL_VERIFICATION_CONFLICT,
+      );
+    }
   }
 
   private async sendEmailVerification(
@@ -73,7 +81,7 @@ export class AuthService {
     const activation_link = `${this.config.get<string>(
       FRONTEND_URL,
     )}/confirm?token=${token}`;
-    await this.mailService.send({
+    this.mailService.send({
       to: email,
       subject: 'Регистрация в сервисе',
       template: './email_verification.hbs',

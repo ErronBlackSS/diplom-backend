@@ -23,17 +23,16 @@ export class AuthDto {
 
 export class SignupResponse {
   @ApiProperty({
-    description: 'Email пользователя',
-  })
-  @IsEmail()
-  @IsNotEmpty()
-  email: string;
-
-  @ApiProperty({
     description: 'Статус аккаута',
   })
   @IsNotEmpty()
   status: string;
+
+  @ApiProperty({
+    description: 'Сообщение',
+  })
+  @IsNotEmpty()
+  message: string;
 }
 
 export class TokenResponse {

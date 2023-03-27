@@ -39,7 +39,7 @@ export class AuthService {
     const code = uuidv4();
 
     try {
-      this.prisma.emailVerification.upsert({
+      await this.prisma.emailVerification.upsert({
         where: {
           email: email,
         },

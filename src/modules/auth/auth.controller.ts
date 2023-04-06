@@ -9,7 +9,13 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
-import { AuthDto, SignupResponse } from './dto/auth.dto';
+import {
+  AuthDto,
+  SignupResponse,
+  TokenResponse,
+  ActivationToken,
+  RegisterResponse,
+} from './dto/auth.dto';
 
 @Controller('auth')
 @ApiTags('auth')
@@ -23,6 +29,17 @@ export class AuthController {
   @Post('signup')
   signup(@Body() data: AuthDto): Promise<SignupResponse> {
     return this.authService.signup(data);
+  }
+
+  @ApiCreatedResponse({
+    description: 'Активация аккаунта',
+    type: TokenResponse,
+  })
+  @Post('register')
+  register(
+    @Body() data: ActivationToken,
+  ): Promise<RegisterResponse> {
+    return this.authService.register(data);
   }
 
   @Get('me')

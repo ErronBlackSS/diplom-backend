@@ -1,9 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
 import {
   IsEmail,
   IsNotEmpty,
   IsString,
+  IsUUID,
 } from 'class-validator';
+import { Tokens, User } from '../auth';
 
 export class AuthDto {
   @ApiProperty({
@@ -35,14 +38,40 @@ export class SignupResponse {
   message: string;
 }
 
+export class RegisterResponse {
+  @ApiProperty({
+    description: 'Статус аккаута',
+  })
+  @IsNotEmpty()
+  user: User;
+
+  @ApiProperty({
+    description: 'Статус аккаута',
+  })
+  @Type(() => TokenResponse)
+  @IsNotEmpty()
+  tokens: Tokens;
+}
+
 export class TokenResponse {
   @ApiProperty({
     description: 'access_token',
   })
+  @IsString()
   access_token: string;
 
   @ApiProperty({
     description: 'refresh_token',
   })
+  @IsString()
   refresh_token: string;
+}
+
+export class ActivationToken {
+  @ApiProperty({
+    description: 'Токен для активации аккаунта',
+  })
+  @IsUUID()
+  @IsString()
+  token: string;
 }

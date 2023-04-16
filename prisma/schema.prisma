@@ -9,6 +9,7 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
 model User {
   id Int @id @default(autoincrement())
 
@@ -40,6 +41,14 @@ model RefreshToken {
 
   user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId Int
+
+  os          String?
+  browser     String?
+  ip          String?
+  device      String?
+  vendor      String?
+  ua          String?
+  expiredDate DateTime?
 
   token String @unique
 

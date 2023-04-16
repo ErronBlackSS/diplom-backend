@@ -3,6 +3,7 @@ import {
   Controller,
   Get,
   Post,
+  Req,
 } from '@nestjs/common';
 import {
   ApiCreatedResponse,
@@ -38,8 +39,18 @@ export class AuthController {
   @Post('register')
   register(
     @Body() data: ActivationToken,
+    @Req() req: Request,
   ): Promise<RegisterResponse> {
-    return this.authService.register(data);
+    return this.authService.register(data, req);
+  }
+
+  @ApiCreatedResponse({
+    description: 'Логин',
+    type: TokenResponse,
+  })
+  @Post('signin')
+  signin(@Body() data: AuthDto, @Req() req: Request) {
+    return this.authService.signin(data, req);
   }
 
   @Get('me')

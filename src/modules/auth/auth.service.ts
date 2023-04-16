@@ -9,6 +9,7 @@ import {
 } from './dto/auth.dto';
 import { ForbiddenException } from '@nestjs/common';
 import {
+  CREDENTIALS_INCORRECT,
   EMAIL_USER_CONFLICT,
   EMAIL_VERIFICATION_CONFLICT,
   INVALID_ACTIVATION_TOKEN,
@@ -18,8 +19,14 @@ import { VERIFICATION } from 'src/constants/account-status.constants';
 import { MailService } from 'src/providers/mail/mail.service';
 import { v4 as uuidv4 } from 'uuid';
 import { ConfigService } from '@nestjs/config';
-import { FRONTEND_URL } from 'src/constants/config.constants';
+import {
+  FRONTEND_URL,
+  REFRESH_TOKEN_SECRET,
+} from 'src/constants/config.constants';
 import { TokensService } from 'src/providers/tokens/tokens.service';
+import { UAParser } from 'ua-parser-js';
+import { JwtService } from '@nestjs/jwt';
+import { DecodedRefreshToken } from './auth';
 @Injectable()
 export class AuthService {
   constructor(
@@ -27,6 +34,7 @@ export class AuthService {
     private mailService: MailService,
     private config: ConfigService,
     private tokensService: TokensService,
+    private jwt: JwtService,
   ) {}
 
   async signup(
@@ -83,8 +91,43 @@ export class AuthService {
     }
   }
 
+  async signin(data: AuthDto, req: Request) {
+    const { email, password } = data;
+
+    const user = await this.prisma.user.findUnique({
+      where: {
+        email: email,
+      },
+    });
+
+    if (!user) {
+      throw new ForbiddenException(CREDENTIALS_INCORRECT);
+    }
+
+    const pwMatches = await argon.verify(
+      user.hash,
+      password,
+    );
+
+    if (!pwMatches) {
+      throw new ForbiddenException(CREDENTIALS_INCORRECT);
+    }
+
+    const ua = UAParser(req.headers['user-agent']);
+
+    const tokens = await this.generateTokens(
+      user.id,
+      user.email,
+      ua,
+      req,
+    );
+
+    return tokens;
+  }
+
   async register(
     data: ActivationToken,
+    req: Request,
   ): Promise<RegisterResponse> {
     const { token } = data;
 
@@ -116,9 +159,13 @@ export class AuthService {
       },
     });
 
+    const ua = UAParser(req.headers['user-agent']);
+
     const tokens = await this.generateTokens(
       user.id,
       user.email,
+      ua,
+      req,
     );
 
     return {
@@ -148,6 +195,8 @@ export class AuthService {
   private async generateTokens(
     userId: number,
     email: string,
+    parsedUA,
+    req,
   ): Promise<TokenResponse> {
     const tokens = await this.signTokens(userId, email);
 
@@ -155,10 +204,32 @@ export class AuthService {
       tokens.refresh_token,
     );
 
+    const ip =
+      req.headers['x-forwarded-for'] ||
+      req.connection.remoteAddress;
+
+    const decodeRefresh: DecodedRefreshToken =
+      this.jwt.verify(tokens.refresh_token, {
+        secret: this.config.get<string>(
+          REFRESH_TOKEN_SECRET,
+        ),
+      });
+
+    const expiredDate: Date = new Date(
+      Number(decodeRefresh.exp) * 1000,
+    );
+
     await this.prisma.refreshToken.create({
       data: {
         user: { connect: { id: userId } },
         token: hashedRefreshToken,
+        os: parsedUA.os.name,
+        browser: parsedUA.browser.name,
+        ip,
+        device: parsedUA.device.type,
+        vendor: parsedUA.device.vendor,
+        ua: parsedUA.ua,
+        expiredDate,
       },
     });
 

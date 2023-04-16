@@ -6,6 +6,7 @@ export const POSTGRES_USER = 'POSTGRES_USER';
 export const POSTGRES_DB = 'POSTGRES_DB';
 export const POSTGRES_PASSWORD = 'POSTGRES_PASSWORD';
 export const POSTGRESS_PORT = 'POSTGRESS_PORT';
+export const REFRESH_TOKEN_SECRET = 'REFRESH_TOKEN_SECRET';
 
 export const SMTP_HOST = 'SMTP_HOST';
 export const SMTP_PORT = 'SMTP_PORT';

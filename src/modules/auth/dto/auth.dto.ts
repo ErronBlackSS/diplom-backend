@@ -3,6 +3,7 @@ import { Type } from 'class-transformer';
 import {
   IsEmail,
   IsNotEmpty,
+  IsNumber,
   IsString,
   IsUUID,
 } from 'class-validator';
@@ -22,6 +23,26 @@ export class AuthDto {
   @IsString()
   @IsNotEmpty()
   password: string;
+}
+
+export class RefreshDto {
+  @ApiProperty({
+    description: 'Refresh-token',
+  })
+  @IsNotEmpty()
+  refreshToken: string;
+
+  @ApiProperty({
+    description: 'Id пользователя',
+  })
+  @IsNotEmpty()
+  userId: number;
+
+  @ApiProperty({
+    description: 'email пользователя',
+  })
+  @IsNotEmpty()
+  email: string;
 }
 
 export class SignupResponse {
@@ -74,4 +95,20 @@ export class ActivationToken {
   @IsUUID()
   @IsString()
   token: string;
+}
+
+export class LogoutDto {
+  @ApiProperty({
+    description: 'Refresh token пользователя',
+  })
+  @IsString()
+  @IsNotEmpty()
+  refreshToken: string;
+
+  @ApiProperty({
+    description: 'id пользователя',
+  })
+  @IsNumber()
+  @IsNotEmpty()
+  userId: number;
 }

@@ -3,6 +3,8 @@ import { PrismaService } from 'src/providers/prisma/prisma.service';
 import {
   ActivationToken,
   AuthDto,
+  LogoutDto,
+  RefreshDto,
   RegisterResponse,
   SignupResponse,
   TokenResponse,
@@ -27,6 +29,7 @@ import { TokensService } from 'src/providers/tokens/tokens.service';
 import { UAParser } from 'ua-parser-js';
 import { JwtService } from '@nestjs/jwt';
 import { DecodedRefreshToken } from './auth';
+import { findAsync } from 'src/helpers/functions';
 @Injectable()
 export class AuthService {
   constructor(
@@ -243,5 +246,89 @@ export class AuthService {
     };
 
     return this.tokensService.signJwt(payload);
+  }
+
+  async refreshTokens(refreshDto: RefreshDto) {
+    const user = await this.prisma.user.findFirstOrThrow({
+      where: {
+        email: refreshDto.email,
+      },
+      include: {
+        refreshTokens: true,
+      },
+    });
+
+    if (!user || !user.refreshTokens.length)
+      throw new ForbiddenException('Invalid token');
+
+    const token = await findAsync(
+      user.refreshTokens,
+      async (token) => {
+        try {
+          return await argon.verify(
+            token.token,
+            refreshDto.refreshToken,
+          );
+        } catch (err) {
+          throw new ForbiddenException('Invalid token');
+        }
+      },
+    );
+
+    if (!token)
+      throw new ForbiddenException('Invalid token');
+
+    const tokens = await this.signTokens(
+      refreshDto.userId,
+      user.email,
+    );
+
+    const hashedRefreshToken = await argon.hash(
+      tokens.refresh_token,
+    );
+
+    await this.prisma.refreshToken.update({
+      where: {
+        token: token.token,
+      },
+      data: {
+        token: hashedRefreshToken,
+      },
+    });
+
+    return tokens;
+  }
+
+  async logout(dto: LogoutDto) {
+    const userRefreshTokens =
+      await this.prisma.refreshToken.findMany({
+        where: {
+          userId: dto.userId,
+        },
+        select: {
+          token: true,
+        },
+      });
+
+    for (const { token } of userRefreshTokens) {
+      const isMatched = await argon.verify(
+        token,
+        dto.refreshToken,
+      );
+
+      if (isMatched) {
+        try {
+          await this.prisma.refreshToken.delete({
+            where: {
+              token: token,
+            },
+          });
+        } catch (e) {
+          if (e.code !== 'P2025') {
+            throw e;
+          }
+        }
+      }
+    }
   }
 }

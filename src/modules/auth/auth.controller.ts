@@ -2,10 +2,14 @@ import {
   Body,
   Controller,
   Get,
+  Patch,
   Post,
+  Query,
   Req,
+  UseGuards,
 } from '@nestjs/common';
 import {
+  ApiBadGatewayResponse,
   ApiCreatedResponse,
   ApiTags,
 } from '@nestjs/swagger';
@@ -16,7 +20,11 @@ import {
   TokenResponse,
   ActivationToken,
   RegisterResponse,
+  LogoutDto,
 } from './dto/auth.dto';
+import { RefreshTokenGuard } from './guard/jwt.guard';
+import { GetUser } from './decorator/get-user.decorator';
+import { User } from './auth';
 
 @Controller('auth')
 @ApiTags('auth')
@@ -53,28 +61,34 @@ export class AuthController {
     return this.authService.signin(data, req);
   }
 
-  @Get('me')
-  getme() {
-    return { name: 'Mihail', tovt: 'SecondName' };
+  @ApiBadGatewayResponse({
+    description: `Error: \n 
+    'Invalid token', \n
+    `,
+  })
+  @ApiCreatedResponse({
+    description: 'Обновление токена',
+    type: TokenResponse,
+  })
+  @Get('refresh')
+  @UseGuards(RefreshTokenGuard)
+  async refreshToken(
+    @GetUser() user: User,
+    @Query('refreshToken') refreshToken: string,
+  ): Promise<TokenResponse> {
+    return this.authService.refreshTokens({
+      email: user.email,
+      refreshToken: refreshToken,
+      userId: user.id,
+    });
   }
-  // @ApiCreatedResponse({
-  //   description: 'Авторизация',
-  //   type: TokenResponse,
-  // })
-  // @Post('singin')
-  // signin(@Body() data: AuthDto): Promise<TokenResponse> {
-  //   return this.authService.signin(data);
-  // }
 
-  // @ApiCreatedResponse({
-  //   description: 'Выход из аккаунта',
-  //   type: TokenResponse,
-  // })
-  // @Post('logout')
-  // async logout(
-  //   @Body('token') refreshToken: string,
-  // ): Promise<{ success: true }> {
-  //   await this.authService.logout(refreshToken);
-  //   return { success: true };
-  // }
+  @Patch('logout')
+  @ApiCreatedResponse({
+    description:
+      'Выход из аккаунта, удаление предыдущей сессии',
+  })
+  async logout(@Body() dto: LogoutDto) {
+    return this.authService.logout(dto);
+  }
 }

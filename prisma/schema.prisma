@@ -20,6 +20,7 @@ model User {
   hash  String
 
   refreshTokens RefreshToken[]
+  Course        Course[]
 
   @@map("users")
 }
@@ -53,4 +54,20 @@ model RefreshToken {
   token String @unique
 
   @@map("user_refresh_tokens")
+}
+
+model Course {
+  id Int @id @default(autoincrement())
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  name      String
+  creator   User    @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+  creatorId Int
+  public    Boolean @default(false)
+
+  published Boolean @default(false)
+
+  @@map("course")
 }

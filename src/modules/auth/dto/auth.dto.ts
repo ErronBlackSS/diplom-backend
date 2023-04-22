@@ -7,7 +7,8 @@ import {
   IsString,
   IsUUID,
 } from 'class-validator';
-import { Tokens, User } from '../auth';
+import { Tokens } from '../auth';
+import { User } from 'src/modules/user/user';
 
 export class AuthDto {
   @ApiProperty({

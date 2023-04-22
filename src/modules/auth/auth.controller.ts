@@ -24,7 +24,7 @@ import {
 } from './dto/auth.dto';
 import { RefreshTokenGuard } from './guard/jwt.guard';
 import { GetUser } from './decorator/get-user.decorator';
-import { User } from './auth';
+import { User } from '../user/user';
 
 @Controller('auth')
 @ApiTags('auth')

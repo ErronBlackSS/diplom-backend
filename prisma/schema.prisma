@@ -69,5 +69,19 @@ model Course {
 
   published Boolean @default(false)
 
+  modules CourseModule[] @relation("CourseModule")
+
   @@map("course")
+}
+
+model CourseModule {
+  id Int @id @default(autoincrement())
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  course   Course @relation("CourseModule", fields: [courseId], references: [id], onDelete: Cascade)
+  courseId Int
+
+  @@map("course_module")
 }

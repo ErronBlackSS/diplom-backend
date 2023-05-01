@@ -32,6 +32,10 @@ export class JwtStrategy extends PassportStrategy(
       where: {
         email: payload.email,
       },
+      select: {
+        id: true,
+        email: true,
+      },
     });
 
     if (!user) {

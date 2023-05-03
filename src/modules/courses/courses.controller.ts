@@ -2,6 +2,8 @@ import {
   Body,
   Controller,
   Get,
+  Param,
+  ParseIntPipe,
   Post,
   UseGuards,
 } from '@nestjs/common';
@@ -12,7 +14,7 @@ import {
 import { UserInfo } from '../user/user';
 import { GetUser } from '../auth/decorator/get-user.decorator';
 import { JwtGuard } from '../auth/guard/jwt.guard';
-import { ExposedCourse } from './courses';
+import { CourseContent, ExposedCourse } from './courses';
 import { CoursesService } from './courses.service';
 import { CreateCourseDto } from './dto/courses.dto';
 
@@ -43,5 +45,16 @@ export class CoursesController {
     @GetUser() user: UserInfo,
   ): Promise<ExposedCourse> {
     return this.coursesService.createCourse(user, data);
+  }
+
+  @ApiCreatedResponse({
+    description: 'Чтение контента курса',
+    type: CreateCourseDto,
+  })
+  @Get(':courseId/content')
+  getCourseContent(
+    @Param('courseId', ParseIntPipe) courseId: number,
+  ): Promise<CourseContent> {
+    return this.coursesService.getCourseContent(courseId);
   }
 }

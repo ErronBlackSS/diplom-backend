@@ -1,11 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/providers/prisma/prisma.service';
 import { UserInfo } from '../user/user';
-import { ExposedCourse } from './courses';
+import { CourseContent, ExposedCourse } from './courses';
 import {
   convertToCourseResponse,
   CreateCourseDto,
 } from './dto/courses.dto';
+import { convertModuleToModuleResponse } from './modules/dto/module.dto';
 
 @Injectable()
 export class CoursesService {
@@ -42,5 +43,21 @@ export class CoursesService {
     });
 
     return convertToCourseResponse(course);
+  }
+
+  async getCourseContent(
+    courseId: number,
+  ): Promise<CourseContent> {
+    const modules = await this.prisma.courseModule.findMany(
+      {
+        where: {
+          courseId: courseId,
+        },
+      },
+    );
+
+    return {
+      modules: convertModuleToModuleResponse(modules),
+    };
   }
 }

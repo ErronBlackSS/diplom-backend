@@ -101,6 +101,7 @@ model ModuleLesson {
   module   CourseModule @relation("ModuleLessons", fields: [moduleId], references: [id], onDelete: Cascade)
   moduleId Int
 
+  name  String
   order Int
 
   @@map("module_lesson")

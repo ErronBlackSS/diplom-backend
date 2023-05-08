@@ -53,6 +53,9 @@ export class CoursesService {
         where: {
           courseId: courseId,
         },
+        include: {
+          lessons: true,
+        },
       },
     );
 

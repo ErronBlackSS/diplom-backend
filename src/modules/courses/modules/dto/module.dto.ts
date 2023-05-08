@@ -1,7 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { CourseModule } from '@prisma/client';
+import { ModuleLesson } from '@prisma/client';
 import { IsString } from 'class-validator';
-import { Module } from '../modules';
+import { Lesson } from '../lessons/lessons';
+import { Module, PrismaCourseModule } from '../modules';
 
 export class CreateModuleDto {
   @ApiProperty({
@@ -17,8 +18,19 @@ export class CreateModuleDto {
   order: number;
 }
 
+export function convertLessonsToLessonsResponse(
+  lessons: ModuleLesson[],
+): Lesson[] {
+  return lessons.map((lesson) => ({
+    id: lesson.id,
+    moduleId: lesson.moduleId,
+    name: lesson.name,
+    order: lesson.order,
+  }));
+}
+
 export function convertFromModule(
-  module: CourseModule,
+  module: PrismaCourseModule,
 ): Module {
   return {
     id: module.id,
@@ -26,17 +38,20 @@ export function convertFromModule(
     name: module.name,
     description: module.description,
     order: module.order,
+    lessons: convertLessonsToLessonsResponse(
+      module.lessons,
+    ),
   };
 }
 
 export function convertModuleToModuleResponse(
-  modules: CourseModule[],
+  modules: PrismaCourseModule[],
 ): Module[];
 export function convertModuleToModuleResponse(
-  modules: CourseModule,
+  modules: PrismaCourseModule,
 ): Module;
 export function convertModuleToModuleResponse(
-  modules: CourseModule | CourseModule[],
+  modules: PrismaCourseModule | PrismaCourseModule[],
 ): Module | Module[] {
   if (Array.isArray(modules)) {
     return modules.map((module) =>

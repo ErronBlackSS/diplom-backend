@@ -27,6 +27,9 @@ export class ModulesService {
             },
           },
         },
+        include: {
+          lessons: true,
+        },
       },
     );
 

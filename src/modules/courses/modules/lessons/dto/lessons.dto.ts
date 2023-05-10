@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString } from 'class-validator';
+import { IsNumber, IsString } from 'class-validator';
 
 export class CreateLessonDto {
   @ApiProperty({
@@ -12,5 +12,10 @@ export class CreateLessonDto {
     description: 'Порядковый номер урока',
   })
   @IsString()
+  order: number;
+}
+
+export class changeLessonOrderDto {
+  @IsNumber()
   order: number;
 }

@@ -1,6 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/providers/prisma/prisma.service';
-import { CreateLessonDto } from './dto/lessons.dto';
+import {
+  changeLessonOrderDto,
+  CreateLessonDto,
+} from './dto/lessons.dto';
 import { Lesson } from './lessons';
 
 @Injectable()
@@ -26,5 +29,20 @@ export class LessonsService {
     );
 
     return newLesson;
+  }
+
+  async changeLessonOrder(
+    lessonId: number,
+    dto: changeLessonOrderDto,
+  ): Promise<Lesson> {
+    console.log('ALESHKA');
+    return this.prisma.moduleLesson.update({
+      where: {
+        id: lessonId,
+      },
+      data: {
+        order: dto.order,
+      },
+    });
   }
 }

@@ -5,6 +5,7 @@ import {
   Param,
   ParseIntPipe,
   Post,
+  Patch,
 } from '@nestjs/common';
 import {
   ApiCreatedResponse,
@@ -14,7 +15,10 @@ import { UserInfo } from 'src/modules/user/user';
 import { GetUser } from 'src/modules/auth/decorator/get-user.decorator';
 import { JwtGuard } from 'src/modules/auth/guard/jwt.guard';
 import { LessonsService } from './lessons.service';
-import { CreateLessonDto } from './dto/lessons.dto';
+import {
+  changeLessonOrderDto,
+  CreateLessonDto,
+} from './dto/lessons.dto';
 import { Lesson } from './lessons';
 
 @UseGuards(JwtGuard)
@@ -33,5 +37,20 @@ export class LessonsController {
     @Body() dto: CreateLessonDto,
   ): Promise<Lesson> {
     return this.lessonsService.createLesson(dto, moduleId);
+  }
+
+  @ApiCreatedResponse({
+    description: 'Изменение порядкого номера урока',
+    type: changeLessonOrderDto,
+  })
+  @Patch(':lessonId/order')
+  changeLessonOrder(
+    @Param('lessonId', ParseIntPipe) lessonId: number,
+    @Body() dto: changeLessonOrderDto,
+  ): Promise<Lesson> {
+    return this.lessonsService.changeLessonOrder(
+      lessonId,
+      dto,
+    );
   }
 }

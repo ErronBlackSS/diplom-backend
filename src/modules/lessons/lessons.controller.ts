@@ -22,7 +22,7 @@ import {
 import { Lesson } from './lessons';
 
 @UseGuards(JwtGuard)
-@Controller('/modules/:moduleId/lessons')
+@Controller('lessons')
 @ApiTags('lessons')
 export class LessonsController {
   constructor(private lessonsService: LessonsService) {}
@@ -31,14 +31,14 @@ export class LessonsController {
     description: 'Создание урока',
     type: CreateLessonDto,
   })
-  @Post()
+  @Post('create')
   createLesson(
-    @Param('moduleId', ParseIntPipe) moduleId: number,
     @Body() dto: CreateLessonDto,
   ): Promise<Lesson> {
-    return this.lessonsService.createLesson(dto, moduleId);
+    return this.lessonsService.createLesson(dto);
   }
 
+  // переделать под общий апдейт
   @ApiCreatedResponse({
     description: 'Изменение порядкого номера урока',
     type: changeLessonOrderDto,

@@ -6,7 +6,7 @@ import {
   convertToCourseResponse,
   CreateCourseDto,
 } from './dto/courses.dto';
-import { convertModuleToModuleResponse } from './modules/dto/module.dto';
+import { convertModuleToModuleResponse } from '../modules/dto/module.dto';
 
 @Injectable()
 export class CoursesService {
@@ -52,6 +52,9 @@ export class CoursesService {
       {
         where: {
           courseId: courseId,
+        },
+        orderBy: {
+          createdAt: 'asc',
         },
         include: {
           lessons: true,

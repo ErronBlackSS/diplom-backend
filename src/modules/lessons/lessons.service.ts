@@ -12,7 +12,6 @@ export class LessonsService {
 
   async createLesson(
     dto: CreateLessonDto,
-    moduleId: number,
   ): Promise<Lesson> {
     const newLesson = await this.prisma.moduleLesson.create(
       {
@@ -21,7 +20,7 @@ export class LessonsService {
           order: dto.order,
           module: {
             connect: {
-              id: moduleId,
+              id: dto.moduleId,
             },
           },
         },
@@ -35,7 +34,6 @@ export class LessonsService {
     lessonId: number,
     dto: changeLessonOrderDto,
   ): Promise<Lesson> {
-    console.log('ALESHKA');
     return this.prisma.moduleLesson.update({
       where: {
         id: lessonId,

@@ -5,21 +5,23 @@ import {
   Param,
   Body,
   ParseIntPipe,
+  Patch,
 } from '@nestjs/common';
 import {
   ApiCreatedResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { GetUser } from 'src/modules/auth/decorator/get-user.decorator';
 import { JwtGuard } from 'src/modules/auth/guard/jwt.guard';
-import { UserInfo } from 'src/modules/user/user';
-import { CreateModuleDto } from './dto/module.dto';
+import {
+  changeModuleDto,
+  CreateModuleDto,
+} from './dto/module.dto';
 import { ModulesService } from './module.service';
 import { Module } from './modules';
 
 @UseGuards(JwtGuard)
-@Controller('/courses/:courseId/module')
-@ApiTags('module')
+@Controller('modules')
+@ApiTags('modules')
 export class ModulesController {
   constructor(private modulesService: ModulesService) {}
 
@@ -27,16 +29,22 @@ export class ModulesController {
     description: 'Создание модуля',
     type: CreateModuleDto,
   })
-  @Post()
+  @Post('create')
   createModule(
-    @GetUser() user: UserInfo,
-    @Param('courseId', ParseIntPipe) courseId: number,
     @Body() dto: CreateModuleDto,
   ): Promise<Module> {
-    return this.modulesService.createModule(
-      user,
-      dto,
-      courseId,
-    );
+    return this.modulesService.createModule(dto);
+  }
+
+  @ApiCreatedResponse({
+    description: 'Изменение модуля',
+    type: changeModuleDto,
+  })
+  @Patch(':moduleId/update')
+  changeModuleName(
+    @Param('moduleId', ParseIntPipe) moduleId: number,
+    @Body() dto: changeModuleDto,
+  ): Promise<Module> {
+    return this.modulesService.changeModule(moduleId, dto);
   }
 }

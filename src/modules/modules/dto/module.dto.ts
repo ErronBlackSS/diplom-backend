@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { ModuleLesson } from '@prisma/client';
-import { IsString } from 'class-validator';
-import { Lesson } from '../lessons/lessons';
+import { IsOptional, IsString } from 'class-validator';
+import { Lesson } from '../../lessons/lessons';
 import { Module, PrismaCourseModule } from '../modules';
 
 export class CreateModuleDto {
@@ -12,9 +12,45 @@ export class CreateModuleDto {
   name: string;
 
   @ApiProperty({
+    description: 'ID курса',
+  })
+  @IsString()
+  courseId: number;
+
+  @ApiProperty({
     description: 'Порядковый номер модуля',
   })
   @IsString()
+  order: number;
+}
+
+export class changeModuleDto {
+  @ApiProperty({
+    description: 'Название модуля',
+  })
+  @IsString()
+  @IsOptional()
+  name: string;
+
+  @ApiProperty({
+    description: 'Описание модуля',
+  })
+  @IsString()
+  @IsOptional()
+  description: string;
+
+  @ApiProperty({
+    description: 'Id курса',
+  })
+  @IsString()
+  @IsOptional()
+  courseId: number;
+
+  @ApiProperty({
+    description: 'Порядковый номер модуля',
+  })
+  @IsString()
+  @IsOptional()
   order: number;
 }
 

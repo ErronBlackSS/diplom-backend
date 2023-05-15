@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { UserInfo } from 'src/modules/user/user';
 import { PrismaService } from 'src/providers/prisma/prisma.service';
 import {
+  changeModuleDto,
   convertModuleToModuleResponse,
   CreateModuleDto,
 } from './dto/module.dto';
@@ -12,9 +12,7 @@ export class ModulesService {
   constructor(private prisma: PrismaService) {}
 
   async createModule(
-    user: UserInfo,
     dto: CreateModuleDto,
-    courseId: number,
   ): Promise<Module> {
     const newModule = await this.prisma.courseModule.create(
       {
@@ -23,7 +21,7 @@ export class ModulesService {
           order: dto.order,
           course: {
             connect: {
-              id: courseId,
+              id: dto.courseId,
             },
           },
         },
@@ -34,5 +32,23 @@ export class ModulesService {
     );
 
     return convertModuleToModuleResponse(newModule);
+  }
+
+  async changeModule(
+    moduleId: number,
+    dto: changeModuleDto,
+  ): Promise<Module> {
+    const updatedModule =
+      await this.prisma.courseModule.update({
+        where: {
+          id: moduleId,
+        },
+        data: dto,
+        include: {
+          lessons: true,
+        },
+      });
+
+    return convertModuleToModuleResponse(updatedModule);
   }
 }

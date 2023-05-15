@@ -11,6 +11,20 @@ export class CreateCourseDto {
   name: string;
 }
 
+export class CreateModuleDto {
+  @ApiProperty({
+    description: 'Название модуля',
+  })
+  @IsString()
+  name: string;
+
+  @ApiProperty({
+    description: 'Порядковый номер модуля',
+  })
+  @IsString()
+  order: number;
+}
+
 export function convertToCourseResponse(
   course: Course,
 ): ExposedCourse {

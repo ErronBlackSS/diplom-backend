@@ -12,6 +12,12 @@ export class CreateLessonDto {
     description: 'Порядковый номер урока',
   })
   @IsString()
+  moduleId: number;
+
+  @ApiProperty({
+    description: 'Порядковый номер урока',
+  })
+  @IsString()
   order: number;
 }
 

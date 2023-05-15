@@ -1,4 +1,4 @@
-import { Module } from './modules/modules';
+import { Module } from '../modules/modules';
 
 export type ExposedCourse = {
   id: number;

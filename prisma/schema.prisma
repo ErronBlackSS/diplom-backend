@@ -101,8 +101,27 @@ model ModuleLesson {
   module   CourseModule @relation("ModuleLessons", fields: [moduleId], references: [id], onDelete: Cascade)
   moduleId Int
 
+  steps LessonStep[] @relation("LessonSteps")
+
   name  String
   order Int
 
   @@map("module_lesson")
+}
+
+model LessonStep {
+  id Int @id @default(autoincrement())
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  lesson   ModuleLesson @relation("LessonSteps", fields: [lessonId], references: [id], onDelete: Cascade)
+  lessonId Int
+
+  type StepType
+}
+
+enum StepType {
+  TEXT
+  TEST
 }

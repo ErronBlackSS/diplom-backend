@@ -3,8 +3,9 @@ import { PrismaService } from 'src/providers/prisma/prisma.service';
 import {
   changeLessonOrderDto,
   CreateLessonDto,
+  ModuleLessonsWithSteps,
 } from './dto/lessons.dto';
-import { Lesson } from './lessons';
+import { Lesson, StepType } from './lessons.types';
 
 @Injectable()
 export class LessonsService {
@@ -28,6 +29,43 @@ export class LessonsService {
     );
 
     return newLesson;
+  }
+
+  async getModuleLessons(
+    moduleId: number,
+  ): Promise<ModuleLessonsWithSteps> {
+    const module =
+      await this.prisma.courseModule.findUnique({
+        where: {
+          id: moduleId,
+        },
+        include: {
+          lessons: {
+            include: {
+              steps: true,
+            },
+          },
+        },
+      });
+
+    const flattenedLessons = module.lessons.map(
+      (lesson) => ({
+        id: lesson.id,
+        name: lesson.name,
+        order: lesson.order,
+        moduleId: lesson.moduleId,
+        steps: lesson.steps.map((step) => ({
+          id: step.id,
+          type: StepType[step.type],
+        })),
+      }),
+    );
+
+    return {
+      moduleId: module.id,
+      moduleName: module.name,
+      lessons: flattenedLessons,
+    };
   }
 
   async changeLessonOrder(

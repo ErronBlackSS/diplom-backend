@@ -1,5 +1,4 @@
 import { ModuleLesson } from '@prisma/client';
-import { Lesson } from '../lessons/lessons';
 
 export type Module = {
   id: number;

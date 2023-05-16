@@ -6,20 +6,20 @@ import {
   ParseIntPipe,
   Post,
   Patch,
+  Get,
 } from '@nestjs/common';
 import {
   ApiCreatedResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { UserInfo } from 'src/modules/user/user';
-import { GetUser } from 'src/modules/auth/decorator/get-user.decorator';
 import { JwtGuard } from 'src/modules/auth/guard/jwt.guard';
 import { LessonsService } from './lessons.service';
 import {
   changeLessonOrderDto,
   CreateLessonDto,
+  ModuleLessonsWithSteps,
 } from './dto/lessons.dto';
-import { Lesson } from './lessons';
+import { Lesson } from './lessons.types';
 
 @UseGuards(JwtGuard)
 @Controller('lessons')
@@ -52,5 +52,17 @@ export class LessonsController {
       lessonId,
       dto,
     );
+  }
+
+  @ApiCreatedResponse({
+    description:
+      'Получение уроков модуля для редактирования',
+    type: ModuleLessonsWithSteps,
+  })
+  @Get(':moduleId/with-steps')
+  getModuleLessons(
+    @Param('moduleId', ParseIntPipe) moduleId: number,
+  ): Promise<ModuleLessonsWithSteps> {
+    return this.lessonsService.getModuleLessons(moduleId);
   }
 }

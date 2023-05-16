@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { ModuleLesson } from '@prisma/client';
 import { IsOptional, IsString } from 'class-validator';
-import { Lesson } from '../../lessons/lessons';
+import { Lesson } from '../../lessons/lessons.types';
 import { Module, PrismaCourseModule } from '../modules';
 
 export class CreateModuleDto {

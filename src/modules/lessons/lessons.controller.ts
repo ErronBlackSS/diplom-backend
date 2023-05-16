@@ -20,6 +20,7 @@ import {
   ModuleLessonsWithSteps,
 } from './dto/lessons.dto';
 import { Lesson } from './lessons.types';
+import { ModuleOwnerGuard } from '../modules/guard/module-owner.guard';
 
 @UseGuards(JwtGuard)
 @Controller('lessons')
@@ -38,7 +39,6 @@ export class LessonsController {
     return this.lessonsService.createLesson(dto);
   }
 
-  // переделать под общий апдейт
   @ApiCreatedResponse({
     description: 'Изменение порядкого номера урока',
     type: changeLessonOrderDto,
@@ -54,6 +54,7 @@ export class LessonsController {
     );
   }
 
+  @UseGuards(ModuleOwnerGuard)
   @ApiCreatedResponse({
     description:
       'Получение уроков модуля для редактирования',

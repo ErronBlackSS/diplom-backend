@@ -5,6 +5,8 @@ import { AuthModule } from './modules/auth/auth.module';
 import { MailModule } from './providers/mail/mail.module';
 import { UserModule } from './modules/user/user.module';
 import { CoursesModule } from './modules/courses/courses.module';
+import { LessonsModule } from './modules/lessons/lessons.module';
+import { ModulesModule } from './modules/modules/module.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -17,6 +19,8 @@ import { CoursesModule } from './modules/courses/courses.module';
     MailModule,
     AuthModule,
     CoursesModule,
+    LessonsModule,
+    ModulesModule,
   ],
 })
 export class AppModule {}

@@ -1,11 +1,12 @@
 import { Injectable } from '@nestjs/common';
+import { StepType } from '@prisma/client';
 import { PrismaService } from 'src/providers/prisma/prisma.service';
 import {
   changeLessonOrderDto,
   CreateLessonDto,
   ModuleLessonsWithSteps,
 } from './dto/lessons.dto';
-import { Lesson, StepType } from './lessons.types';
+import { Lesson } from './lessons.types';
 
 @Injectable()
 export class LessonsService {
@@ -27,6 +28,18 @@ export class LessonsService {
         },
       },
     );
+
+    await this.prisma.lessonStep.create({
+      data: {
+        content: 'Новый шаг урока!',
+        type: StepType.TEXT,
+        lesson: {
+          connect: {
+            id: newLesson.id,
+          },
+        },
+      },
+    });
 
     return newLesson;
   }

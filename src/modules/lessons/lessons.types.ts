@@ -1,3 +1,5 @@
+import { Step } from './steps/steps';
+
 export enum LESSON_TYPES {
   PROG,
   TEST,
@@ -10,15 +12,5 @@ export type Lesson = {
   name: string;
   order: number;
 };
-
-export type Step = {
-  id: number;
-  type: StepType;
-};
-
-export enum StepType {
-  TEXT,
-  TEST,
-}
 
 export type LessonWithSteps = Lesson & { steps: Step[] };

@@ -118,7 +118,37 @@ model LessonStep {
   lesson   ModuleLesson @relation("LessonSteps", fields: [lessonId], references: [id], onDelete: Cascade)
   lessonId Int
 
-  type StepType
+  type    StepType
+  content String
+  test    Test?
+}
+
+model Test {
+  id Int @id @default(autoincrement())
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  step   LessonStep @relation(fields: [stepId], references: [id], onDelete: Cascade)
+  stepId Int        @unique
+
+  answers TestAnswer[]
+
+  @@map("test_step")
+}
+
+model TestAnswer {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+
+  name    String
+  isRight Boolean @default(false)
+
+  test   Test @relation(fields: [testId], references: [id], onDelete: Cascade)
+  testId Int
+
+  @@map("test_answer")
 }
 
 enum StepType {

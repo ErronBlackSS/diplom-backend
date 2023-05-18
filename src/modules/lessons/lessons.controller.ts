@@ -21,6 +21,7 @@ import {
 } from './dto/lessons.dto';
 import { Lesson } from './lessons.types';
 import { ModuleOwnerGuard } from '../modules/guard/module-owner.guard';
+import { LessonOwnerGuard } from './guard/lesson-owner.guard';
 
 @UseGuards(JwtGuard)
 @Controller('lessons')
@@ -39,6 +40,7 @@ export class LessonsController {
     return this.lessonsService.createLesson(dto);
   }
 
+  @UseGuards(LessonOwnerGuard)
   @ApiCreatedResponse({
     description: 'Изменение порядкого номера урока',
     type: changeLessonOrderDto,

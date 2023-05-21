@@ -39,4 +39,15 @@ export class TestService {
 
     return updatedAnswer;
   }
+
+  async deleteAnswer(answerId: number) {
+    const updatedAnswer =
+      await this.prisma.testAnswer.delete({
+        where: {
+          id: answerId,
+        },
+      });
+
+    return updatedAnswer;
+  }
 }

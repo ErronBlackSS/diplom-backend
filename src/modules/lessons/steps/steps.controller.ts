@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   ParseIntPipe,
@@ -96,5 +97,16 @@ export class StepsController {
     dto: ChangeAnswerDto,
   ) {
     return this.testService.сhangeAnswer(answerId, dto);
+  }
+
+  @ApiCreatedResponse({
+    description: 'Удаление шага',
+    type: ChangeAnswerDto,
+  })
+  @Delete(':stepId/test/answer/:answerId')
+  deleteAnswer(
+    @Param('answerId', ParseIntPipe) answerId: number,
+  ) {
+    return this.testService.deleteAnswer(answerId);
   }
 }

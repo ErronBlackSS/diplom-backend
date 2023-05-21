@@ -1,6 +1,10 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { ModuleLesson } from '@prisma/client';
-import { IsOptional, IsString } from 'class-validator';
+import {
+  IsNumber,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 import { Lesson } from '../../lessons/lessons.types';
 import { Module, PrismaCourseModule } from '../modules';
 
@@ -49,7 +53,7 @@ export class changeModuleDto {
   @ApiProperty({
     description: 'Порядковый номер модуля',
   })
-  @IsString()
+  @IsNumber()
   @IsOptional()
   order: number;
 }

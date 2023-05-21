@@ -16,7 +16,7 @@ import {
 import { JwtGuard } from 'src/modules/auth/guard/jwt.guard';
 import { LessonsService } from './lessons.service';
 import {
-  changeLessonOrderDto,
+  ChangeLessonOrderDto,
   CreateLessonDto,
   ModuleLessonsWithSteps,
 } from './dto/lessons.dto';
@@ -44,12 +44,12 @@ export class LessonsController {
   @UseGuards(LessonOwnerGuard)
   @ApiCreatedResponse({
     description: 'Изменение порядкого номера урока',
-    type: changeLessonOrderDto,
+    type: ChangeLessonOrderDto,
   })
   @Patch(':lessonId/order')
   changeLessonOrder(
     @Param('lessonId', ParseIntPipe) lessonId: number,
-    @Body() dto: changeLessonOrderDto,
+    @Body() dto: ChangeLessonOrderDto,
   ): Promise<Lesson> {
     return this.lessonsService.changeLessonOrder(
       lessonId,

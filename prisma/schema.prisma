@@ -150,6 +150,8 @@ model TestAnswer {
   test   Test @relation(fields: [testId], references: [id], onDelete: Cascade)
   testId Int
 
+  order Int
+
   @@map("test_answer")
 }
 

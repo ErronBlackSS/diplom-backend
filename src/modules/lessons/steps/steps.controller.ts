@@ -4,6 +4,7 @@ import {
   Get,
   Param,
   ParseIntPipe,
+  Patch,
   Post,
   UseGuards,
 } from '@nestjs/common';
@@ -11,16 +12,25 @@ import {
   ApiCreatedResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { CreateStepDto } from './dto/steps.dto';
+import {
+  ChangeAnswerDto,
+  CreateAnswerDto,
+  CreateStepDto,
+  UpdateStepContentDto,
+} from './dto/steps.dto';
 import { StepsService } from './steps.service';
 import { LessonOwnerGuard } from '../guard/lesson-owner.guard';
 import { JwtGuard } from 'src/modules/auth/guard/jwt.guard';
+import { TestService } from './test.service';
 
 @UseGuards(JwtGuard, LessonOwnerGuard)
 @Controller('lessons/:lessonId/steps')
 @ApiTags('steps')
 export class StepsController {
-  constructor(private stepsService: StepsService) {}
+  constructor(
+    private stepsService: StepsService,
+    private testService: TestService,
+  ) {}
 
   @ApiCreatedResponse({
     description: 'Чтение шагов урока',
@@ -43,6 +53,18 @@ export class StepsController {
   }
 
   @ApiCreatedResponse({
+    description: 'Обновление контента шага',
+    type: UpdateStepContentDto,
+  })
+  @Patch(':stepId/content')
+  updateStepContent(
+    @Param('stepId', ParseIntPipe) stepId: number,
+    @Body() dto: UpdateStepContentDto,
+  ) {
+    return this.stepsService.updateStepContent(stepId, dto);
+  }
+
+  @ApiCreatedResponse({
     description: 'Создание шага',
     type: CreateStepDto,
   })
@@ -52,5 +74,27 @@ export class StepsController {
     @Body() dto: CreateStepDto,
   ) {
     return this.stepsService.createStep(lessonId, dto);
+  }
+
+  @ApiCreatedResponse({
+    description: 'Создание шага',
+    type: CreateStepDto,
+  })
+  @Post(':stepId/test/answer')
+  createAnswer(@Body() dto: CreateAnswerDto) {
+    return this.testService.createAnswer(dto);
+  }
+
+  @ApiCreatedResponse({
+    description: 'Создание шага',
+    type: ChangeAnswerDto,
+  })
+  @Patch(':stepId/test/answer/:answerId')
+  changeAnswer(
+    @Param('answerId', ParseIntPipe) answerId: number,
+    @Body()
+    dto: ChangeAnswerDto,
+  ) {
+    return this.testService.сhangeAnswer(answerId, dto);
   }
 }

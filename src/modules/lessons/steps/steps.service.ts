@@ -1,7 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { StepType } from '@prisma/client';
 import { PrismaService } from 'src/providers/prisma/prisma.service';
-import { CreateStepDto } from './dto/steps.dto';
+import {
+  CreateStepDto,
+  UpdateStepContentDto,
+} from './dto/steps.dto';
 
 @Injectable()
 export class StepsService {
@@ -11,6 +14,9 @@ export class StepsService {
     const steps = await this.prisma.lessonStep.findMany({
       where: {
         lessonId: lessonId,
+      },
+      orderBy: {
+        createdAt: 'asc',
       },
     });
 
@@ -47,6 +53,7 @@ export class StepsService {
           stepId: step.test.stepId,
           answers: step.test.answers.map((answer) => ({
             id: answer.id,
+            order: answer.order,
             name: answer.name,
             isRight: answer.isRight,
             testId: answer.testId,
@@ -81,6 +88,20 @@ export class StepsService {
     }
 
     return step;
+  }
+
+  async updateStepContent(
+    stepId: number,
+    dto: UpdateStepContentDto,
+  ) {
+    await this.prisma.lessonStep.update({
+      where: {
+        id: stepId,
+      },
+      data: {
+        content: dto.content,
+      },
+    });
   }
 
   private async createTest(stepId: number) {

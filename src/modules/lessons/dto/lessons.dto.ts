@@ -46,7 +46,7 @@ export class ModuleLessonsWithSteps {
   lessons: LessonWithSteps[];
 }
 
-export class changeLessonOrderDto {
+export class ChangeLessonOrderDto {
   @ApiProperty({
     description: 'Новый порядковый номер урока',
   })

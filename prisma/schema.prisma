@@ -121,6 +121,8 @@ model LessonStep {
   type    StepType
   content String
   test    Test?
+
+  @@map("lesson_step")
 }
 
 model Test {
@@ -134,7 +136,7 @@ model Test {
 
   answers TestAnswer[]
 
-  @@map("test_step")
+  @@map("test")
 }
 
 model TestAnswer {

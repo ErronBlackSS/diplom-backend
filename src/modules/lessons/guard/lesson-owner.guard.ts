@@ -5,6 +5,7 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from 'src/providers/prisma/prisma.service';
 import { CourseOwnerGuard } from 'src/modules/courses/guard/course-owner.guard';
+import { UserInfo } from 'src/modules/user/user';
 
 @Injectable()
 export class LessonOwnerGuard
@@ -44,7 +45,7 @@ export class LessonOwnerGuard
       },
     );
 
-    super.courseId = course.module.courseId;
+    super.courseId = course.module.course.id;
 
     return super.canActivate(context);
   }

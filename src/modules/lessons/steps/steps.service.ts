@@ -12,6 +12,21 @@ export class StepsService {
       where: {
         lessonId: lessonId,
       },
+    });
+
+    const convertedSteps = steps.map((step) => ({
+      id: step.id,
+      type: step.type,
+    }));
+
+    return convertedSteps;
+  }
+
+  async getStep(stepId: number) {
+    const step = await this.prisma.lessonStep.findUnique({
+      where: {
+        id: stepId,
+      },
       include: {
         test: {
           include: {
@@ -21,16 +36,13 @@ export class StepsService {
       },
     });
 
-    const convertedSteps = steps.map((step) => {
-      const flattenedStep = {
-        id: step.id,
-        type: step.type,
-        content: step.content,
-        test: undefined,
-      };
-      let test;
-      if (step.test) {
-        test = {
+    const flattenedStep = {
+      stepId: step.id,
+      content: step.content,
+    };
+
+    const flattenedTest = step.test
+      ? {
           id: step.test.id,
           stepId: step.test.stepId,
           answers: step.test.answers.map((answer) => ({
@@ -39,13 +51,14 @@ export class StepsService {
             isRight: answer.isRight,
             testId: answer.testId,
           })),
-        };
-      }
-      flattenedStep.test = test || undefined;
-      return flattenedStep;
-    });
+        }
+      : null;
 
-    return convertedSteps;
+    return {
+      step: flattenedStep,
+      type: step.type,
+      test: flattenedTest,
+    };
   }
 
   async createStep(lessonId: number, dto: CreateStepDto) {

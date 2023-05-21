@@ -94,4 +94,12 @@ export class LessonsService {
       },
     });
   }
+
+  async deleteLesson(lessonId: number) {
+    await this.prisma.moduleLesson.delete({
+      where: {
+        id: lessonId,
+      },
+    });
+  }
 }

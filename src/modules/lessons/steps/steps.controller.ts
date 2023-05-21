@@ -5,6 +5,7 @@ import {
   Param,
   ParseIntPipe,
   Post,
+  UseGuards,
 } from '@nestjs/common';
 import {
   ApiCreatedResponse,
@@ -12,8 +13,11 @@ import {
 } from '@nestjs/swagger';
 import { CreateStepDto } from './dto/steps.dto';
 import { StepsService } from './steps.service';
+import { LessonOwnerGuard } from '../guard/lesson-owner.guard';
+import { JwtGuard } from 'src/modules/auth/guard/jwt.guard';
 
-@Controller(':lessonId/steps')
+@UseGuards(JwtGuard, LessonOwnerGuard)
+@Controller('lessons/:lessonId/steps')
 @ApiTags('steps')
 export class StepsController {
   constructor(private stepsService: StepsService) {}
@@ -27,6 +31,15 @@ export class StepsController {
     @Param('lessonId', ParseIntPipe) lessonId: number,
   ) {
     return this.stepsService.getLessonSteps(lessonId);
+  }
+
+  @ApiCreatedResponse({
+    description: 'Чтение шагa',
+    type: CreateStepDto,
+  })
+  @Get(':stepId')
+  getStep(@Param('stepId', ParseIntPipe) stepId: number) {
+    return this.stepsService.getStep(stepId);
   }
 
   @ApiCreatedResponse({

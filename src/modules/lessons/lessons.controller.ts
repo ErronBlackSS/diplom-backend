@@ -7,6 +7,7 @@ import {
   Post,
   Patch,
   Get,
+  Delete,
 } from '@nestjs/common';
 import {
   ApiCreatedResponse,
@@ -54,6 +55,17 @@ export class LessonsController {
       lessonId,
       dto,
     );
+  }
+
+  @UseGuards(LessonOwnerGuard)
+  @ApiCreatedResponse({
+    description: 'Удаление урока',
+  })
+  @Delete(':lessonId/delete')
+  deleteLesson(
+    @Param('lessonId', ParseIntPipe) lessonId: number,
+  ) {
+    return this.lessonsService.deleteLesson(lessonId);
   }
 
   @UseGuards(ModuleOwnerGuard)

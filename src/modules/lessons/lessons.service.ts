@@ -4,7 +4,7 @@ import { PrismaService } from 'src/providers/prisma/prisma.service';
 import {
   ChangeLessonOrderDto,
   CreateLessonDto,
-  ModuleLessonsWithSteps,
+  LessonsByModuleDto,
 } from './dto/lessons.dto';
 import { Lesson } from './lessons.types';
 
@@ -45,39 +45,39 @@ export class LessonsService {
   }
 
   async getModuleLessons(
-    moduleId: number,
-  ): Promise<ModuleLessonsWithSteps> {
-    const module =
-      await this.prisma.courseModule.findUnique({
-        where: {
-          id: moduleId,
-        },
-        include: {
-          lessons: {
-            include: {
-              steps: true,
-            },
+    courseId: number,
+  ): Promise<LessonsByModuleDto> {
+    const course = await this.prisma.course.findUnique({
+      where: {
+        id: courseId,
+      },
+      include: {
+        modules: {
+          include: {
+            lessons: true,
+          },
+          orderBy: {
+            createdAt: 'asc',
           },
         },
-      });
+      },
+    });
 
-    const flattenedLessons = module.lessons.map(
-      (lesson) => ({
-        id: lesson.id,
-        name: lesson.name,
-        order: lesson.order,
-        moduleId: lesson.moduleId,
-        steps: lesson.steps.map((step) => ({
-          id: step.id,
-          type: StepType[step.type],
+    const flattenedModules = course.modules.map(
+      (module) => ({
+        id: module.id,
+        name: module.name,
+        lessons: module.lessons.map((lesson) => ({
+          id: lesson.id,
+          name: lesson.name,
+          order: lesson.order,
         })),
       }),
     );
 
     return {
-      moduleId: module.id,
-      moduleName: module.name,
-      lessons: flattenedLessons,
+      courseName: course.name,
+      modules: flattenedModules,
     };
   }
 

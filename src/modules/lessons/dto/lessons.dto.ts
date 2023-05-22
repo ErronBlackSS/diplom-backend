@@ -4,7 +4,7 @@ import {
   IsNumber,
   IsString,
 } from 'class-validator';
-import { LessonWithSteps } from '../lessons.types';
+import { ModulesWithLessons } from '../lessons.types';
 
 export class CreateLessonDto {
   @ApiProperty({
@@ -26,24 +26,18 @@ export class CreateLessonDto {
   order: number;
 }
 
-export class ModuleLessonsWithSteps {
+export class LessonsByModuleDto {
   @ApiProperty({
-    description: 'Название модуля',
+    description: 'Название курса',
   })
   @IsString()
-  moduleName: string;
+  courseName: string;
 
   @ApiProperty({
-    description: 'Id модуля',
-  })
-  @IsNumber()
-  moduleId: number;
-
-  @ApiProperty({
-    description: 'Шаги урока',
+    description: 'Уроки по модулям',
   })
   @IsArray()
-  lessons: LessonWithSteps[];
+  modules: ModulesWithLessons[];
 }
 
 export class ChangeLessonOrderDto {

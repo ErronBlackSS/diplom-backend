@@ -18,7 +18,7 @@ import { LessonsService } from './lessons.service';
 import {
   ChangeLessonOrderDto,
   CreateLessonDto,
-  ModuleLessonsWithSteps,
+  LessonsByModuleDto,
 } from './dto/lessons.dto';
 import { Lesson } from './lessons.types';
 import { ModuleOwnerGuard } from '../modules/guard/module-owner.guard';
@@ -72,12 +72,12 @@ export class LessonsController {
   @ApiCreatedResponse({
     description:
       'Получение уроков модуля для редактирования',
-    type: ModuleLessonsWithSteps,
+    type: LessonsByModuleDto,
   })
-  @Get(':moduleId/with-steps')
+  @Get(':courseId/modules-with-lessons')
   getModuleLessons(
-    @Param('moduleId', ParseIntPipe) moduleId: number,
-  ): Promise<ModuleLessonsWithSteps> {
-    return this.lessonsService.getModuleLessons(moduleId);
+    @Param('courseId', ParseIntPipe) courseId: number,
+  ): Promise<LessonsByModuleDto> {
+    return this.lessonsService.getModuleLessons(courseId);
   }
 }

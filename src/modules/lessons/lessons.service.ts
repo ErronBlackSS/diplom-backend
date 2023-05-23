@@ -44,6 +44,24 @@ export class LessonsService {
     return newLesson;
   }
 
+  async getLessonSteps(lessonId: number) {
+    const steps = await this.prisma.lessonStep.findMany({
+      where: {
+        lessonId: lessonId,
+      },
+      orderBy: {
+        createdAt: 'asc',
+      },
+    });
+
+    const convertedSteps = steps.map((step) => ({
+      id: step.id,
+      type: step.type,
+    }));
+
+    return convertedSteps;
+  }
+
   async getModuleLessons(
     courseId: number,
   ): Promise<LessonsByModuleDto> {

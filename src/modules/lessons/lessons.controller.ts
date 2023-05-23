@@ -41,6 +41,16 @@ export class LessonsController {
     return this.lessonsService.createLesson(dto);
   }
 
+  @ApiCreatedResponse({
+    description: 'Чтение шагов урока',
+  })
+  @Get(':lessonId/steps')
+  getLessonSteps(
+    @Param('lessonId', ParseIntPipe) lessonId: number,
+  ) {
+    return this.lessonsService.getLessonSteps(lessonId);
+  }
+
   @UseGuards(LessonOwnerGuard)
   @ApiCreatedResponse({
     description: 'Изменение порядкого номера урока',

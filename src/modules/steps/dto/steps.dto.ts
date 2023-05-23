@@ -8,6 +8,12 @@ import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateStepDto {
   @ApiProperty({
+    description: 'Id урока',
+  })
+  @IsNumber()
+  lessonId: number;
+
+  @ApiProperty({
     description: 'Тип шага',
   })
   @IsString()

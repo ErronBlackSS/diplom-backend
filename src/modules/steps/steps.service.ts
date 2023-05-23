@@ -10,24 +10,6 @@ import {
 export class StepsService {
   constructor(private prisma: PrismaService) {}
 
-  async getLessonSteps(lessonId: number) {
-    const steps = await this.prisma.lessonStep.findMany({
-      where: {
-        lessonId: lessonId,
-      },
-      orderBy: {
-        createdAt: 'asc',
-      },
-    });
-
-    const convertedSteps = steps.map((step) => ({
-      id: step.id,
-      type: step.type,
-    }));
-
-    return convertedSteps;
-  }
-
   async getStep(stepId: number) {
     const step = await this.prisma.lessonStep.findUnique({
       where: {

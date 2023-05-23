@@ -20,29 +20,17 @@ import {
   UpdateStepContentDto,
 } from './dto/steps.dto';
 import { StepsService } from './steps.service';
-import { LessonOwnerGuard } from '../guard/lesson-owner.guard';
 import { JwtGuard } from 'src/modules/auth/guard/jwt.guard';
 import { TestService } from './test.service';
 
-@UseGuards(JwtGuard, LessonOwnerGuard)
-@Controller('lessons/:lessonId/steps')
+@UseGuards(JwtGuard)
+@Controller('steps')
 @ApiTags('steps')
 export class StepsController {
   constructor(
     private stepsService: StepsService,
     private testService: TestService,
   ) {}
-
-  @ApiCreatedResponse({
-    description: 'Чтение шагов урока',
-    type: CreateStepDto,
-  })
-  @Get()
-  getLessonSteps(
-    @Param('lessonId', ParseIntPipe) lessonId: number,
-  ) {
-    return this.stepsService.getLessonSteps(lessonId);
-  }
 
   @ApiCreatedResponse({
     description: 'Чтение шагa',
@@ -70,15 +58,12 @@ export class StepsController {
     type: CreateStepDto,
   })
   @Post()
-  createStep(
-    @Param('lessonId', ParseIntPipe) lessonId: number,
-    @Body() dto: CreateStepDto,
-  ) {
-    return this.stepsService.createStep(lessonId, dto);
+  createStep(@Body() dto: CreateStepDto) {
+    return this.stepsService.createStep(dto);
   }
 
   @ApiCreatedResponse({
-    description: 'Создание шага',
+    description: 'Создание ответа',
     type: CreateStepDto,
   })
   @Post(':stepId/test/answer')
@@ -87,7 +72,7 @@ export class StepsController {
   }
 
   @ApiCreatedResponse({
-    description: 'Создание шага',
+    description: 'Изменение ответа',
     type: ChangeAnswerDto,
   })
   @Patch(':stepId/test/answer/:answerId')
@@ -100,7 +85,7 @@ export class StepsController {
   }
 
   @ApiCreatedResponse({
-    description: 'Удаление шага',
+    description: 'Удаление ответа',
     type: ChangeAnswerDto,
   })
   @Delete(':stepId/test/answer/:answerId')

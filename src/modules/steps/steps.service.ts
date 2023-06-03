@@ -50,8 +50,8 @@ export class StepsService {
     };
   }
 
-  async createStep(lessonId: number, dto: CreateStepDto) {
-    const { type, content } = dto;
+  async createStep(dto: CreateStepDto) {
+    const { type, content, lessonId } = dto;
 
     const step = await this.prisma.lessonStep.create({
       data: {

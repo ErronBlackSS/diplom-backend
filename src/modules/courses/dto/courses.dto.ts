@@ -1,12 +1,21 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Course } from '@prisma/client';
-import { IsString } from 'class-validator';
+import { IsOptional, IsString } from 'class-validator';
 import { ExposedCourse } from '../courses';
 
 export class CreateCourseDto {
   @ApiProperty({
     description: 'Название курса',
   })
+  @IsString()
+  name: string;
+}
+
+export class ChangeCourseDto {
+  @ApiProperty({
+    description: 'Название курса',
+  })
+  @IsOptional()
   @IsString()
   name: string;
 }

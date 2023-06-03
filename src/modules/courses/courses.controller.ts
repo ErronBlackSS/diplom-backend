@@ -1,9 +1,11 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   ParseIntPipe,
+  Patch,
   Post,
   UseGuards,
 } from '@nestjs/common';
@@ -16,7 +18,10 @@ import { GetUser } from '../auth/decorator/get-user.decorator';
 import { JwtGuard } from '../auth/guard/jwt.guard';
 import { CourseContent, ExposedCourse } from './courses';
 import { CoursesService } from './courses.service';
-import { CreateCourseDto } from './dto/courses.dto';
+import {
+  CreateCourseDto,
+  ChangeCourseDto,
+} from './dto/courses.dto';
 
 @UseGuards(JwtGuard)
 @Controller('courses')
@@ -48,6 +53,17 @@ export class CoursesController {
   }
 
   @ApiCreatedResponse({
+    description: 'Удаление курса',
+    type: CreateCourseDto,
+  })
+  @Delete(':courseId')
+  deleteCourse(
+    @Param('courseId', ParseIntPipe) courseId: number,
+  ) {
+    return this.coursesService.deleteCourse(courseId);
+  }
+
+  @ApiCreatedResponse({
     description: 'Чтение контента курса',
     type: CreateCourseDto,
   })
@@ -56,5 +72,17 @@ export class CoursesController {
     @Param('courseId', ParseIntPipe) courseId: number,
   ): Promise<CourseContent> {
     return this.coursesService.getCourseContent(courseId);
+  }
+
+  @ApiCreatedResponse({
+    description: 'Изменение курса',
+    type: ChangeCourseDto,
+  })
+  @Patch(':courseId/update')
+  changeModuleName(
+    @Param('courseId', ParseIntPipe) courseId: number,
+    @Body() dto: ChangeCourseDto,
+  ): Promise<ExposedCourse> {
+    return this.coursesService.changeCourse(courseId, dto);
   }
 }

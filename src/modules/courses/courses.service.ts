@@ -3,6 +3,7 @@ import { PrismaService } from 'src/providers/prisma/prisma.service';
 import { UserInfo } from '../user/user';
 import { CourseContent, ExposedCourse } from './courses';
 import {
+  ChangeCourseDto,
   convertToCourseResponse,
   CreateCourseDto,
 } from './dto/courses.dto';
@@ -18,6 +19,9 @@ export class CoursesService {
     const userCourses = await this.prisma.course.findMany({
       where: {
         creatorId: user.userId,
+      },
+      orderBy: {
+        createdAt: 'asc',
       },
     });
 
@@ -65,5 +69,27 @@ export class CoursesService {
     return {
       modules: convertModuleToModuleResponse(modules),
     };
+  }
+
+  async deleteCourse(courseId: number) {
+    await this.prisma.course.delete({
+      where: {
+        id: courseId,
+      },
+    });
+  }
+
+  async changeCourse(
+    courseId: number,
+    dto: ChangeCourseDto,
+  ) {
+    const updatedCourse = await this.prisma.course.update({
+      where: {
+        id: courseId,
+      },
+      data: dto,
+    });
+
+    return convertToCourseResponse(updatedCourse);
   }
 }

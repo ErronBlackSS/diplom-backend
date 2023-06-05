@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/providers/prisma/prisma.service';
-import { UserInfo } from '../user/user';
+import { UserInfo } from '../user/user.types';
 import { CourseContent, ExposedCourse } from './courses';
 import {
   ChangeCourseDto,

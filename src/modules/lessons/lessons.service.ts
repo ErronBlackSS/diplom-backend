@@ -49,6 +49,9 @@ export class LessonsService {
       where: {
         lessonId: lessonId,
       },
+      include: {
+        usersPassed: true,
+      },
       orderBy: {
         createdAt: 'asc',
       },
@@ -57,6 +60,9 @@ export class LessonsService {
     const convertedSteps = steps.map((step) => ({
       id: step.id,
       type: step.type,
+      usersPassed: step.usersPassed.map(
+        (user) => user.userId,
+      ),
     }));
 
     return convertedSteps;

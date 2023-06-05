@@ -19,8 +19,9 @@ model User {
   email String @unique
   hash  String
 
-  refreshTokens RefreshToken[]
-  Course        Course[]
+  refreshTokens  RefreshToken[]
+  Course         Course[]
+  UserPassedStep UserPassedStep[]
 
   @@map("users")
 }
@@ -118,9 +119,10 @@ model LessonStep {
   lesson   ModuleLesson @relation("LessonSteps", fields: [lessonId], references: [id], onDelete: Cascade)
   lessonId Int
 
-  type    StepType
-  content String
-  test    Test?
+  type        StepType
+  content     String
+  test        Test?
+  usersPassed UserPassedStep[]
 
   @@map("lesson_step")
 }
@@ -153,6 +155,17 @@ model TestAnswer {
   order Int
 
   @@map("test_answer")
+}
+
+model UserPassedStep {
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    Int
+  reglament LessonStep @relation(fields: [stepId], references: [id], onDelete: Cascade)
+  stepId    Int
+  createdAt DateTime   @default(now())
+
+  @@unique([userId, stepId])
+  @@map("users_passed_step")
 }
 
 enum StepType {

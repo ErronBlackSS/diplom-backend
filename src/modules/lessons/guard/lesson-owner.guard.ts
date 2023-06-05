@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from 'src/providers/prisma/prisma.service';
 import { CourseOwnerGuard } from 'src/modules/courses/guard/course-owner.guard';
-import { UserInfo } from 'src/modules/user/user';
+import { UserInfo } from 'src/modules/user/user.types';
 
 @Injectable()
 export class LessonOwnerGuard

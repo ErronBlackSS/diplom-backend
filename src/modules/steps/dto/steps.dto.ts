@@ -1,4 +1,6 @@
 import {
+  IsArray,
+  IsNotEmpty,
   IsNumber,
   IsOptional,
   IsString,
@@ -68,4 +70,13 @@ export class ChangeAnswerDto {
   @IsNumber()
   @IsOptional()
   order: number;
+}
+
+export class CompleteStepTestDto {
+  @ApiProperty({
+    description: 'ответ(ы) на вопрос',
+  })
+  @IsArray()
+  @IsNotEmpty()
+  answers: Array<number>;
 }

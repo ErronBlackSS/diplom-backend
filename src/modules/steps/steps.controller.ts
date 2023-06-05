@@ -18,10 +18,13 @@ import {
   CreateAnswerDto,
   CreateStepDto,
   UpdateStepContentDto,
+  CompleteStepTestDto,
 } from './dto/steps.dto';
 import { StepsService } from './steps.service';
 import { JwtGuard } from 'src/modules/auth/guard/jwt.guard';
 import { TestService } from './test.service';
+import { GetUser } from '../auth/decorator/get-user.decorator';
+import { UserInfo } from '../user/user.types';
 
 @UseGuards(JwtGuard)
 @Controller('steps')
@@ -93,5 +96,29 @@ export class StepsController {
     @Param('answerId', ParseIntPipe) answerId: number,
   ) {
     return this.testService.deleteAnswer(answerId);
+  }
+
+  @ApiCreatedResponse({
+    description: 'Прохождение шага',
+    type: CompleteStepTestDto,
+  })
+  @Post(':stepId/complete')
+  completeStep(
+    @Param('stepId', ParseIntPipe) stepId: number,
+    @GetUser() user: UserInfo,
+  ) {
+    return this.stepsService.completeStep(stepId, user);
+  }
+
+  @ApiCreatedResponse({
+    description: 'Проверка ответов теста',
+    type: CompleteStepTestDto,
+  })
+  @Post(':stepId/test/complete')
+  completeTest(
+    @Param('stepId', ParseIntPipe) stepId: number,
+    @Body() dto: CompleteStepTestDto,
+  ) {
+    return this.stepsService.completeStepTest(stepId, dto);
   }
 }

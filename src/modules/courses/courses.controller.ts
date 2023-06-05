@@ -13,7 +13,7 @@ import {
   ApiCreatedResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { UserInfo } from '../user/user';
+import { UserInfo } from '../user/user.types';
 import { GetUser } from '../auth/decorator/get-user.decorator';
 import { JwtGuard } from '../auth/guard/jwt.guard';
 import { CourseContent, ExposedCourse } from './courses';

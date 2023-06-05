@@ -3,7 +3,7 @@ import {
   ExecutionContext,
   Injectable,
 } from '@nestjs/common';
-import { UserInfo } from 'src/modules/user/user';
+import { UserInfo } from 'src/modules/user/user.types';
 import { PrismaService } from 'src/providers/prisma/prisma.service';
 
 @Injectable()

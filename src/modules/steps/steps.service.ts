@@ -1,7 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { StepType } from '@prisma/client';
 import { PrismaService } from 'src/providers/prisma/prisma.service';
+import { UserInfo } from '../user/user.types';
 import {
+  CompleteStepTestDto,
   CreateStepDto,
   UpdateStepContentDto,
 } from './dto/steps.dto';
@@ -63,6 +65,9 @@ export class StepsService {
           },
         },
       },
+      include: {
+        usersPassed: true,
+      },
     });
 
     if (type === StepType.TEST) {
@@ -84,6 +89,61 @@ export class StepsService {
         content: dto.content,
       },
     });
+  }
+
+  async completeStep(stepId: number, user: UserInfo) {
+    const complete =
+      await this.prisma.userPassedStep.create({
+        data: {
+          userId: user.userId,
+          stepId: stepId,
+        },
+      });
+
+    return complete.userId;
+  }
+
+  async completeStepTest(
+    stepId: number,
+    dto: CompleteStepTestDto,
+  ) {
+    const step = await this.prisma.lessonStep.findUnique({
+      where: {
+        id: stepId,
+      },
+      include: {
+        test: {
+          include: {
+            answers: true,
+          },
+        },
+      },
+    });
+
+    const failedAnswers: number[] = [];
+    const stepTestAnswers = step.test.answers;
+
+    const rightAnswers = stepTestAnswers.filter(
+      (answer) => answer.isRight,
+    );
+
+    rightAnswers.forEach((answer) => {
+      if (!dto.answers.includes(answer.id)) {
+        failedAnswers.push(answer.id);
+      }
+    });
+
+    let status: string;
+    if (failedAnswers.length !== 0) {
+      status = 'failed';
+    } else {
+      status = 'success';
+    }
+
+    return {
+      status,
+      failedAnswers,
+    };
   }
 
   private async createTest(stepId: number) {

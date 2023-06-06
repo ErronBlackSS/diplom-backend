@@ -16,12 +16,17 @@ import {
 import { UserInfo } from '../user/user.types';
 import { GetUser } from '../auth/decorator/get-user.decorator';
 import { JwtGuard } from '../auth/guard/jwt.guard';
-import { CourseContent, ExposedCourse } from './courses';
+import {
+  CourseChecklist,
+  CourseContent,
+  ExposedCourse,
+} from './courses';
 import { CoursesService } from './courses.service';
 import {
   CreateCourseDto,
   ChangeCourseDto,
 } from './dto/courses.dto';
+import { CourseOwnerGuard } from 'src/modules/courses/guard/course-owner.guard';
 
 @UseGuards(JwtGuard)
 @Controller('courses')
@@ -52,6 +57,7 @@ export class CoursesController {
     return this.coursesService.createCourse(user, data);
   }
 
+  @UseGuards(CourseOwnerGuard)
   @ApiCreatedResponse({
     description: 'Удаление курса',
     type: CreateCourseDto,
@@ -63,6 +69,7 @@ export class CoursesController {
     return this.coursesService.deleteCourse(courseId);
   }
 
+  @UseGuards(CourseOwnerGuard)
   @ApiCreatedResponse({
     description: 'Чтение контента курса',
     type: CreateCourseDto,
@@ -74,6 +81,19 @@ export class CoursesController {
     return this.coursesService.getCourseContent(courseId);
   }
 
+  @UseGuards(CourseOwnerGuard)
+  @ApiCreatedResponse({
+    description: 'Чтение чеклиста курса',
+    type: CreateCourseDto,
+  })
+  @Get(':courseId/checklist')
+  getCourseChecklist(
+    @Param('courseId', ParseIntPipe) courseId: number,
+  ): Promise<CourseChecklist> {
+    return this.coursesService.getCourseChecklist(courseId);
+  }
+
+  @UseGuards(CourseOwnerGuard)
   @ApiCreatedResponse({
     description: 'Изменение курса',
     type: ChangeCourseDto,

@@ -10,3 +10,15 @@ export type ExposedCourse = {
 export type CourseContent = {
   modules: Module[];
 };
+
+export interface CourseChecklist {
+  enoughModules: number;
+  moduleNames: boolean;
+  enoughLessons: number;
+  enoughTests: number;
+  testEnoughAnswers: boolean;
+  testRightAnswers: boolean;
+  emptyModules: boolean;
+  enoughSteps: boolean;
+  stepsEmptyContent: boolean;
+}

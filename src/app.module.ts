@@ -8,6 +8,7 @@ import { CoursesModule } from './modules/courses/courses.module';
 import { LessonsModule } from './modules/lessons/lessons.module';
 import { ModulesModule } from './modules/modules/module.module';
 import { StepsModule } from './modules/steps/steps.module';
+import { CatalogModule } from './modules/catalog/catalog.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -23,6 +24,7 @@ import { StepsModule } from './modules/steps/steps.module';
     LessonsModule,
     ModulesModule,
     StepsModule,
+    CatalogModule,
   ],
 })
 export class AppModule {}

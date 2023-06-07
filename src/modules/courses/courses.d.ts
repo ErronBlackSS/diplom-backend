@@ -5,9 +5,12 @@ export type ExposedCourse = {
   name: string;
   dateCreate: Date;
   creatorId: number;
+  published: boolean;
+  promo: string | null;
 };
 
 export type CourseContent = {
+  course: ExposedCourse;
   modules: Module[];
 };
 

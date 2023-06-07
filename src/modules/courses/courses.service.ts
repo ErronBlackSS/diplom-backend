@@ -56,21 +56,28 @@ export class CoursesService {
   async getCourseContent(
     courseId: number,
   ): Promise<CourseContent> {
-    const modules = await this.prisma.courseModule.findMany(
-      {
-        where: {
-          courseId: courseId,
-        },
-        orderBy: {
-          createdAt: 'asc',
-        },
-        include: {
-          lessons: true,
-        },
-      },
-    );
+    const [course, modules] =
+      await this.prisma.$transaction([
+        this.prisma.course.findUnique({
+          where: {
+            id: courseId,
+          },
+        }),
+        this.prisma.courseModule.findMany({
+          where: {
+            courseId: courseId,
+          },
+          orderBy: {
+            createdAt: 'asc',
+          },
+          include: {
+            lessons: true,
+          },
+        }),
+      ]);
 
     return {
+      course: convertToCourseResponse(course),
       modules: convertModuleToModuleResponse(modules),
     };
   }

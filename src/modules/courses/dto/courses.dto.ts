@@ -1,6 +1,10 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Course } from '@prisma/client';
-import { IsOptional, IsString } from 'class-validator';
+import {
+  IsBoolean,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 import { ExposedCourse } from '../courses';
 
 export class CreateCourseDto {
@@ -18,6 +22,13 @@ export class ChangeCourseDto {
   @IsOptional()
   @IsString()
   name: string;
+
+  @ApiProperty({
+    description: 'Статус публикации',
+  })
+  @IsOptional()
+  @IsBoolean()
+  published: boolean;
 }
 
 export class CreateModuleDto {
@@ -42,5 +53,7 @@ export function convertToCourseResponse(
     name: course.name,
     dateCreate: course.createdAt,
     creatorId: course.creatorId,
+    published: course.published,
+    promo: course.promo,
   };
 }

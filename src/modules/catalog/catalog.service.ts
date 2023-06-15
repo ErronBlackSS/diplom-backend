@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/providers/prisma/prisma.service';
+import { convertToCourseResponse } from '../courses/dto/courses.dto';
 
 @Injectable()
 export class CatalogService {
@@ -10,12 +11,51 @@ export class CatalogService {
       where: {
         published: true,
       },
-      select: {
-        id: true,
-        name: true,
+      include: {
+        modules: {
+          include: {
+            lessons: true,
+            _count: {
+              select: {
+                lessons: true,
+              },
+            },
+          },
+        },
       },
     });
 
-    return catalog;
+    let lessonsCount = 0;
+    catalog.forEach((course) => {
+      course.modules.forEach((_module) => {
+        lessonsCount += _module._count.lessons;
+      });
+    });
+
+    const flattenedCatalog = catalog.map((course) => ({
+      id: course.id,
+      name: course.name,
+      modulesCount: course.modules.length,
+      lessonsCount: lessonsCount,
+    }));
+
+    return flattenedCatalog;
+  }
+
+  async getCoursePromo(courseId: number) {
+    const promo = await this.prisma.course.findUnique({
+      where: {
+        id: courseId,
+      },
+      include: {
+        CourseImage: {
+          select: {
+            path: true,
+          },
+        },
+      },
+    });
+
+    return convertToCourseResponse(promo);
   }
 }

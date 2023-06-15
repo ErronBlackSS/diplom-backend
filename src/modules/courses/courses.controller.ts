@@ -8,6 +8,8 @@ import {
   Patch,
   Post,
   UseGuards,
+  UseInterceptors,
+  UploadedFile,
 } from '@nestjs/common';
 import {
   ApiCreatedResponse,
@@ -25,8 +27,11 @@ import { CoursesService } from './courses.service';
 import {
   CreateCourseDto,
   ChangeCourseDto,
+  ChangeCourseImageDto,
 } from './dto/courses.dto';
 import { CourseOwnerGuard } from 'src/modules/courses/guard/course-owner.guard';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { multerConfig } from 'multer.config';
 
 @UseGuards(JwtGuard)
 @Controller('courses')
@@ -39,10 +44,10 @@ export class CoursesController {
     type: CreateCourseDto,
   })
   @Get()
-  getUserCourses(
+  getUserOwnerCourses(
     @GetUser() user: UserInfo,
   ): Promise<ExposedCourse[]> {
-    return this.coursesService.getUserCourses(user);
+    return this.coursesService.getUserOwnerCourses(user);
   }
 
   @ApiCreatedResponse({
@@ -104,5 +109,44 @@ export class CoursesController {
     @Body() dto: ChangeCourseDto,
   ): Promise<ExposedCourse> {
     return this.coursesService.changeCourse(courseId, dto);
+  }
+
+  @UseGuards(CourseOwnerGuard)
+  @ApiCreatedResponse({
+    description: 'Изменение картинки курса',
+    type: ChangeCourseImageDto,
+  })
+  @Post(':courseId/image')
+  @UseInterceptors(FileInterceptor('file', multerConfig))
+  changeCourseImage(
+    @UploadedFile() file: Express.Multer.File,
+    @Param('courseId', ParseIntPipe) courseId: number,
+  ) {
+    return this.coursesService.changeImage(courseId, file);
+  }
+
+  @ApiCreatedResponse({
+    description: 'Запись пользователя на курс',
+    type: ChangeCourseImageDto,
+  })
+  @Post(':courseId/book')
+  bookUserOnCourse(
+    @Param('courseId', ParseIntPipe) courseId: number,
+    @GetUser() user: UserInfo,
+  ) {
+    return this.coursesService.bookOnCourse(
+      courseId,
+      user.userId,
+    );
+  }
+
+  @ApiCreatedResponse({
+    description:
+      'Чтение курсов на которые записан пользователь',
+    type: ChangeCourseImageDto,
+  })
+  @Get('userCourses')
+  getUserCourses(@GetUser() user: UserInfo) {
+    return this.coursesService.getUserCourses(user);
   }
 }

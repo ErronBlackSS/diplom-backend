@@ -1,4 +1,9 @@
-import { Controller, Get } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Param,
+  ParseIntPipe,
+} from '@nestjs/common';
 import {
   ApiCreatedResponse,
   ApiTags,
@@ -16,5 +21,15 @@ export class CatalogController {
   @Get()
   getCatalog() {
     return this.catalogService.getCatalog();
+  }
+
+  @ApiCreatedResponse({
+    description: 'Чтение промо курса',
+  })
+  @Get(':courseId/promo')
+  getPromo(
+    @Param('courseId', ParseIntPipe) courseId: number,
+  ) {
+    return this.catalogService.getCoursePromo(courseId);
   }
 }

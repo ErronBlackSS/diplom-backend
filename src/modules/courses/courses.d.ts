@@ -1,4 +1,9 @@
+import { Course } from '@prisma/client';
 import { Module } from '../modules/modules';
+
+export type PrismaCourse = Course & {
+  CourseImage: { path: string };
+};
 
 export type ExposedCourse = {
   id: number;
@@ -7,6 +12,7 @@ export type ExposedCourse = {
   creatorId: number;
   published: boolean;
   promo: string | null;
+  imagePath: string;
 };
 
 export type CourseContent = {

@@ -24,6 +24,7 @@ model User {
   refreshTokens  RefreshToken[]
   Course         Course[]
   UserPassedStep UserPassedStep[]
+  UsersOnCourse  UsersOnCourse[]
 
   @@map("users")
 }
@@ -73,9 +74,33 @@ model Course {
 
   published Boolean @default(false)
 
-  modules CourseModule[] @relation("CourseModules")
+  modules       CourseModule[]  @relation("CourseModules")
+  CourseImage   CourseImage?
+  UsersOnCourse UsersOnCourse[]
 
   @@map("course")
+}
+
+model UsersOnCourse {
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    Int
+  course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  courseId  Int
+  createdAt DateTime @default(now())
+
+  @@unique([userId, courseId])
+  @@map("users_on_course")
+}
+
+model CourseImage {
+  id        Int      @id @default(autoincrement())
+  filename  String
+  path      String
+  size      Int
+  createdAt DateTime @default(now())
+
+  course   Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  courseId Int    @unique
 }
 
 model CourseModule {
@@ -163,7 +188,7 @@ model TestAnswer {
 model UserPassedStep {
   user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId    Int
-  reglament LessonStep @relation(fields: [stepId], references: [id], onDelete: Cascade)
+  step      LessonStep @relation(fields: [stepId], references: [id], onDelete: Cascade)
   stepId    Int
   createdAt DateTime   @default(now())
 

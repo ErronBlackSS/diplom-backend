@@ -12,12 +12,17 @@ import {
   CreateCourseDto,
 } from './dto/courses.dto';
 import { convertModuleToModuleResponse } from '../modules/dto/module.dto';
+import { ConfigService } from '@nestjs/config';
+import { API_URL } from 'src/constants/config.constants';
 
 @Injectable()
 export class CoursesService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private config: ConfigService,
+  ) {}
 
-  async getUserCourses(
+  async getUserOwnerCourses(
     user: UserInfo,
   ): Promise<ExposedCourse[]> {
     const userCourses = await this.prisma.course.findMany({
@@ -27,11 +32,106 @@ export class CoursesService {
       orderBy: {
         createdAt: 'asc',
       },
+      include: {
+        CourseImage: {
+          select: {
+            path: true,
+          },
+        },
+      },
     });
 
     return userCourses.map((course) =>
       convertToCourseResponse(course),
     );
+  }
+
+  async getUserCourses(
+    user: UserInfo,
+  ): Promise<ExposedCourse[]> {
+    const userCourses = await this.prisma.course.findMany({
+      where: {
+        UsersOnCourse: {
+          some: {
+            userId: user.userId,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: 'asc',
+      },
+      include: {
+        CourseImage: {
+          select: {
+            path: true,
+          },
+        },
+        modules: {
+          include: {
+            lessons: {
+              include: {
+                steps: {
+                  include: {
+                    usersPassed: {
+                      select: {
+                        userId: true,
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
+
+    return userCourses.map((course) => {
+      let stepsCount = 0;
+      let passedStepsCount = 0;
+
+      course.modules.forEach((module) => {
+        module.lessons.forEach((lesson) => {
+          lesson.steps.forEach((step) => {
+            stepsCount += 1;
+            const userPassedIds = step.usersPassed.map(
+              (user) => user.userId,
+            );
+            if (userPassedIds.includes(user.userId)) {
+              passedStepsCount += 1;
+            }
+          });
+        });
+      });
+
+      return {
+        id: course.id,
+        name: course.name,
+        dateCreate: course.createdAt,
+        creatorId: course.creatorId,
+        published: course.published,
+        promo: course.promo,
+        imagePath: course.CourseImage
+          ? `${this.config.get(API_URL)}/${
+              course.CourseImage.path
+            }`
+          : null,
+        stepsCount: stepsCount,
+        passedStepsCount: passedStepsCount,
+      };
+    });
+  }
+
+  async bookOnCourse(courseId: number, userId: number) {
+    const userOnCourse =
+      await this.prisma.usersOnCourse.create({
+        data: {
+          userId: userId,
+          courseId: courseId,
+        },
+      });
+
+    return userOnCourse;
   }
 
   async createCourse(
@@ -48,6 +148,13 @@ export class CoursesService {
           },
         },
       },
+      include: {
+        CourseImage: {
+          select: {
+            path: true,
+          },
+        },
+      },
     });
 
     return convertToCourseResponse(course);
@@ -61,6 +168,13 @@ export class CoursesService {
         this.prisma.course.findUnique({
           where: {
             id: courseId,
+          },
+          include: {
+            CourseImage: {
+              select: {
+                path: true,
+              },
+            },
           },
         }),
         this.prisma.courseModule.findMany({
@@ -99,9 +213,47 @@ export class CoursesService {
         id: courseId,
       },
       data: dto,
+      include: {
+        CourseImage: {
+          select: {
+            path: true,
+          },
+        },
+      },
     });
 
     return convertToCourseResponse(updatedCourse);
+  }
+
+  async changeImage(
+    courseId: number,
+    file: Express.Multer.File,
+  ) {
+    const createdFile =
+      await this.prisma.courseImage.upsert({
+        where: {
+          courseId: courseId,
+        },
+        update: {
+          filename: file.originalname,
+          path: file.path,
+          size: file.size,
+        },
+        create: {
+          filename: file.originalname,
+          path: file.path,
+          size: file.size,
+          course: {
+            connect: {
+              id: courseId,
+            },
+          },
+        },
+      });
+
+    return `${this.config.get(API_URL)}/${
+      createdFile.path
+    }`;
   }
 
   async getCourseChecklist(courseId: number) {
@@ -166,7 +318,6 @@ export class CoursesService {
         step.content === 'Вопрос с вариантами ответа' ||
         step.content === 'Новый шаг урока!'
       ) {
-        console.log(step.content, 'alo');
         checkList.stepsEmptyContent = false;
       }
 

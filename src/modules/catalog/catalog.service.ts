@@ -1,10 +1,15 @@
 import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { API_URL } from 'src/constants/config.constants';
 import { PrismaService } from 'src/providers/prisma/prisma.service';
 import { convertToCourseResponse } from '../courses/dto/courses.dto';
 
 @Injectable()
 export class CatalogService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private config: ConfigService,
+  ) {}
 
   async getCatalog() {
     const catalog = await this.prisma.course.findMany({
@@ -12,6 +17,11 @@ export class CatalogService {
         published: true,
       },
       include: {
+        CourseImage: {
+          select: {
+            path: true,
+          },
+        },
         modules: {
           include: {
             lessons: true,
@@ -35,6 +45,9 @@ export class CatalogService {
     const flattenedCatalog = catalog.map((course) => ({
       id: course.id,
       name: course.name,
+      imagePath: `${this.config.get(API_URL)}/${
+        course.CourseImage.path
+      }`,
       modulesCount: course.modules.length,
       lessonsCount: lessonsCount,
     }));
